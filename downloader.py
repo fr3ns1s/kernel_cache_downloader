@@ -39,7 +39,7 @@ def download_fw(filter_versions,filter_devices,dev_kernel,beta_ipsw):
         else:
             firmwares = json_firmwares
         print("Firmwares for {0} found: {1}".format(device["identifier"],len(firmwares)))
-        dir_device_path = os.path.join(curr_dir, device["name"] + "__" + device["identifier"] + "")
+        dir_device_path = os.path.join(curr_dir, device["name"].replace("/","_") + "__" + device["identifier"] + "")
         if os.path.isdir(dir_device_path) == False:
             os.mkdir(dir_device_path)
         for firmware in firmwares:
