@@ -58,7 +58,7 @@ def download_fw(filter_versions,filter_devices,dev_kernel,beta_ipsw):
             except pexpect.EOF:
                 break
             if debug:print(fw_dir_list)
-            kernelfiles = re.findall("kernelcache.d.*" if dev_kernel else "kernelcache.r.*",fw_dir_list)
+            kernelfiles = re.findall("kernelcache.res.*" if dev_kernel else "kernelcache.rel*",fw_dir_list)
             if len(kernelfiles) != 0:
                 print("Kernelfiles found: {0}".format(len(kernelfiles)))
                 folder_name = firmware["version"] + "__" + firmware["buildid"]
