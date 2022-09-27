@@ -17,7 +17,10 @@ def download_fw(filter_versions,filter_devices,dev_kernel):
        if json_devices == None or len(json_devices) == 0:
            print("Devices not found!")
            exit(-1)
-    devices = [x for x in json_devices for xs in filter_devices if xs in x['identifier']]
+    if len(filter_devices) >0:
+        devices = [x for x in json_devices for xs in filter_devices if xs in x['identifier']]
+    else:
+        devices = json_devices
     print("Devices found: {0}".format(len(devices)))
     for device in devices:
         r = requests.get('https://api.ipsw.me/v4/device/' + device["identifier"] + '?type=ipsw')
@@ -28,13 +31,16 @@ def download_fw(filter_versions,filter_devices,dev_kernel):
            print("Firmwares not found for {0}".format(device["identifier"]))
            continue
         json_firmwares = json_firmwares["firmwares"]
-        firmwares = [x for x in json_firmwares for xs in filter_versions if xs in x['version']]
+        if len(filter_versions) > 0:
+            firmwares = [x for x in json_firmwares for xs in filter_versions if xs in x['version']]
+        else:
+            firmwares = json_firmwares
         print("Firmwares for {0} found: {1}".format(device["identifier"],len(firmwares)))
         dir_device_path = os.path.join(curr_dir, device["name"] + "__" + device["identifier"] + "")
         if os.path.isdir(dir_device_path) == False:
             os.mkdir(dir_device_path)
         for firmware in firmwares:
-            print("Analyzing {0}".format(firmware["version"]))
+            print("Analyzing {0} {1}".format(device["identifier"],firmware["version"]))
             child = pexpect.spawn("./pzb " + firmware["url"] )
             try:
                 child.expect(b' $')
@@ -75,7 +81,10 @@ def download_beta_fw(filter_versions,filter_devices,dev_kernel):
        if json_devices == None or len(json_devices) == 0:
            print("Devices not found!")
            exit(-1)
-    devices = [x for x in json_devices for xs in filter_devices if xs in x['identifier']]
+    if len(filter_devices) >0:
+        devices = [x for x in json_devices for xs in filter_devices if xs in x['identifier']]
+    else:
+        devices = json_devices
     print("Devices found: {0}".format(len(devices)))
     for device in devices:
         r = requests.get('https://api.m1sta.xyz/betas/' + device["identifier"])
@@ -85,13 +94,16 @@ def download_beta_fw(filter_versions,filter_devices,dev_kernel):
         if json_firmwares == None or len(json_firmwares) == 0:
            print("Firmwares not found for {0}".format(device["identifier"]))
            continue
-        firmwares = [x for x in json_firmwares for xs in filter_versions if xs in x['version']]
+        if len(filter_versions) > 0:
+            firmwares = [x for x in json_firmwares for xs in filter_versions if xs in x['version']]
+        else:
+            firmwares = json_firmwares
         print("Firmwares for {0} found: {1}".format(device["identifier"],len(firmwares)))
         dir_device_path = os.path.join(curr_dir, device["name"] + "__" + device["identifier"] + "")
         if os.path.isdir(dir_device_path) == False:
             os.mkdir(dir_device_path)
         for firmware in firmwares:
-            print("Analyzing {0}".format(firmware["version"]))
+            print("Analyzing {0} {1}".format(device["identifier"],firmware["version"]))
             child = pexpect.spawn("./pzb " + firmware["url"] )
             try:
                 child.expect(b' $')
