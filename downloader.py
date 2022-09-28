@@ -24,6 +24,8 @@ def download_fw(filter_versions,filter_devices,dev_kernel,beta_ipsw):
         devices = json_devices
     print("Devices found: {0}".format(len(devices)))
     for device in devices:
+        # if not "iPhone" in device["identifier"]:
+        #     continue
         url = ('https://api.m1sta.xyz/betas/' + device["identifier"]) if beta_ipsw else ('https://api.ipsw.me/v4/device/' + device["identifier"] + '?type=ipsw')
         r = requests.get(url)
         if r.status_code != 200:
@@ -49,14 +51,16 @@ def download_fw(filter_versions,filter_devices,dev_kernel,beta_ipsw):
                 child.expect(b' $')
                 if debug:print(child.before)
             except pexpect.EOF:
-                break  
+                print("Error on init url")
+                continue  
             child.write("ls\n".encode())
             fw_dir_list = ""
             try:
                 child.expect(b' $')
                 fw_dir_list = child.before
             except pexpect.EOF:
-                break
+                print("Error on get file list")
+                continue
             if debug:print(fw_dir_list)
             kernelfiles = re.findall("kernelcache.res.*" if dev_kernel else "kernelcache.rel*",fw_dir_list)
             if len(kernelfiles) != 0:
@@ -74,7 +78,8 @@ def download_fw(filter_versions,filter_devices,dev_kernel,beta_ipsw):
                         shutil.move(kernelfile_file_path,dir_path)
                         kernelcache_downloaed_counter +=1
                     except:
-                         break
+                         print("Error on download")
+                         continue
         if len(fnmatch.filter(os.listdir(dir_device_path), '*.*')) == 0:
             os.rmdir(dir_device_path)
     print("Kernelcache downloaded {0}".format(kernelcache_downloaed_counter))
